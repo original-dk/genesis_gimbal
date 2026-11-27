@@ -19,7 +19,7 @@ base
 The robot has 12 leg joints and two gimbal joints. The locomotion training and
 evaluation environment loads this asset directly. Its policy controls the 12 leg
 joints by name and observes their states. Separate position controllers hold both
-gimbal axes at zero with provisional gains of kp=5 and kd=0.1 and torque limits
+gimbal axes at zero with provisional gains of kp=0.5 and kd=0.01 and torque limits
 from the URDF effort values. Episode resets restore the full robot state including both axes.
 The policy action dimension remains 12 and its observation dimension remains 45.
 Training with this asset includes the added accessory mass and inertia.
@@ -75,10 +75,12 @@ communication-delay and internal-drive-loop dynamics are outside this rigid
 simulation. The manual gives no measured motor mass or rotor inertia, so the
 CAD-derived estimates below remain in use.
 
-The previous 0.2 N m placeholder exceeds the manual's stall torque. With the
-continuous rated torque limit, the 10-second local standing-scene test loses
-stable marker tracking. Servo gains, disturbance rejection and transient torque
-modeling require calibration at the motor's measured operating conditions.
+The two gimbal joints use zero additional armature because their CAD moving
+links already contain the estimated rotor inertia. The robot morph's default
+0.1 kg m^2 additional armature dominates small gimbal inertias and creates slow
+acceleration and braking under rated torque. Leg armatures retain their values.
+Servo gains and gravity compensation share `examples/locomotion/go2_gimbal.py`.
+Hardware calibration and transient torque modeling remain necessary.
 
 Masses and inertias are estimates from CAD solid geometry and uniform material
 densities: PETG 1270 kg/m^3 for the base plate and carrier, aluminum 2700 kg/m^3

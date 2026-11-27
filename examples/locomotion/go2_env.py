@@ -1,6 +1,7 @@
 import math
 
 import torch
+from go2_gimbal import GIMBAL_KP, GIMBAL_KV
 from tensordict import TensorDict
 
 import genesis as gs
@@ -94,8 +95,10 @@ class Go2Env:
         # PD control parameters
         self.robot.set_dofs_kp([self.env_cfg["kp"]] * self.num_actions, self.motors_dof_idx)
         self.robot.set_dofs_kv([self.env_cfg["kd"]] * self.num_actions, self.motors_dof_idx)
-        self.robot.set_dofs_kp([5.0, 5.0], self.gimbal_dof_idx)
-        self.robot.set_dofs_kv([0.1, 0.1], self.gimbal_dof_idx)
+        self.robot.set_dofs_kp([GIMBAL_KP, GIMBAL_KP], self.gimbal_dof_idx)
+        self.robot.set_dofs_kv([GIMBAL_KV, GIMBAL_KV], self.gimbal_dof_idx)
+        # The CAD links already carry the rotor inertia. Added robot armature overwhelms these small motors.
+        self.robot.set_dofs_armature([0.0, 0.0], self.gimbal_dof_idx)
         # The URDF effort limits define the motors' continuous torque bounds.
 
         # Define global gravity direction vector

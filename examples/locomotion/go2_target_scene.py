@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 import torch
 from go2_aiming import AimController, Fusion, GimbalSolver, RangeGeom, cast_ranges, detect_icon, fuse_depth
+from go2_gimbal import GIMBAL_KP
 
 import genesis as gs
 from genesis.utils.geom import quat_to_R
@@ -131,7 +132,7 @@ class TargetScene:
             _, _, moment_after = self.solver.forward(angles + delta)
             compensation[i] = -np.dot(gravity_local, moment_after - moment_before) / 2e-5
         targets[:] = torch.tensor(
-            np.clip(command + compensation / 5.0, self.solver.limits[:, 0], self.solver.limits[:, 1]),
+            np.clip(command + compensation / GIMBAL_KP, self.solver.limits[:, 0], self.solver.limits[:, 1]),
             device=gs.device,
         )
         aperture = positions[1] + rotations[1] @ self.solver.aperture
