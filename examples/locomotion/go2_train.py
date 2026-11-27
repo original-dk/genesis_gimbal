@@ -1,4 +1,5 @@
 import argparse
+import math
 import os
 import pickle
 import shutil
@@ -131,9 +132,9 @@ def get_cfgs():
     }
     command_cfg = {
         "num_commands": 3,
-        "lin_vel_x_range": [0.5, 0.5],
-        "lin_vel_y_range": [0, 0],
-        "ang_vel_range": [0, 0],
+        "lin_vel_x_range": [-1.5, 1.5],
+        "lin_vel_y_range": [-1.0, 1.0],
+        "ang_vel_range": [-1.5, 1.5],
     }
 
     return env_cfg, obs_cfg, reward_cfg, command_cfg
@@ -145,12 +146,26 @@ def main():
         "-e", "--exp-name", type=str, default="go2-walking", help="Experiment name; also the log directory under logs/"
     )
     parser.add_argument("-b", "--num-envs", type=int, default=4096, help="Number of parallel environments")
-    parser.add_argument("--max-iterations", type=int, default=101, help="Number of learning iterations")
+    parser.add_argument("--max-iterations", type=int, default=1001, help="Number of learning iterations")
+    parser.add_argument("--max-forward-speed", type=float, default=1.5, help="Forward/backward speed limit in m/s")
+    parser.add_argument("--max-lateral-speed", type=float, default=1.0, help="Lateral speed limit in m/s")
+    parser.add_argument("--max-yaw-rate", type=float, default=1.5, help="Turning speed limit in rad/s")
     parser.add_argument("--seed", type=int, default=1, help="Random seed")
     args = parser.parse_args()
+    if any(
+        not math.isfinite(value) or value <= 0
+        for value in (args.max_forward_speed, args.max_lateral_speed, args.max_yaw_rate)
+    ):
+        parser.error("Velocity limits must be finite and positive.")
 
     log_dir = f"logs/{args.exp_name}"
     env_cfg, obs_cfg, reward_cfg, command_cfg = get_cfgs()
+    for name, limit in (
+        ("lin_vel_x_range", args.max_forward_speed),
+        ("lin_vel_y_range", args.max_lateral_speed),
+        ("ang_vel_range", args.max_yaw_rate),
+    ):
+        command_cfg[name] = [-limit, limit]
     train_cfg = get_train_cfg(args.exp_name)
 
     if os.path.exists(log_dir):
