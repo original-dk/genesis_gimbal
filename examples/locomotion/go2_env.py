@@ -13,7 +13,7 @@ def gs_rand(lower, upper, batch_shape):
 
 
 class Go2Env:
-    def __init__(self, num_envs, env_cfg, obs_cfg, reward_cfg, command_cfg, show_viewer=False):
+    def __init__(self, num_envs, env_cfg, obs_cfg, reward_cfg, command_cfg, show_viewer=False, scene_setup=None):
         self.num_envs: int = num_envs
         self.num_actions = env_cfg["num_actions"]
         self.cfg = env_cfg
@@ -74,6 +74,8 @@ class Go2Env:
             ),
         )
 
+        if scene_setup is not None:
+            scene_setup(self.scene, self.robot)
         self.scene.build(n_envs=num_envs)
 
         # names to indices
