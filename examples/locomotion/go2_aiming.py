@@ -1,12 +1,9 @@
 """Estimate marker depth from RGB and geometric LiDAR and solve two-axis laser aiming."""
 
 from dataclasses import dataclass
-from pathlib import Path
-from xml.etree import ElementTree as ET
 
 import cv2
 import numpy as np
-from scipy.spatial.transform import Rotation
 
 
 @dataclass(frozen=True)
@@ -89,118 +86,23 @@ def fuse_depth(detection: Detection | None, camera_points: np.ndarray, intrinsic
     return fits[0] if len(fits) == 1 else Fusion("ambiguous, sparse or nonplanar surface")
 
 
-@dataclass(frozen=True)
-class GimbalJoint:
-    transform: np.ndarray
-    axis: np.ndarray
-    limits: np.ndarray
-
-
-@dataclass(frozen=True)
-class MassPoint:
-    mass: float
-    com: np.ndarray
-
-
-class GimbalSolver:
-    """Solve laser direction using the exported URDF geometry in the carrier frame."""
-
-    def __init__(self, urdf: Path):
-        root = ET.parse(urdf).getroot()
-        self.mount = np.eye(4)
-        self.joints: list[GimbalJoint] = []
-        for name in (
-            "mount_base_joint",
-            "gimbal_carrier_joint",
-            "gimbal_base_joint",
-            "gimbal_yaw_joint",
-            "gimbal_pitch_joint",
-        ):
-            joint = root.find(f"joint[@name='{name}']")
-            assert joint is not None
-            origin = joint.find("origin")
-            transform = np.eye(4)
-            transform[:3, 3] = np.fromstring(origin.get("xyz"), sep=" ")
-            transform[:3, :3] = Rotation.from_euler("xyz", np.fromstring(origin.get("rpy"), sep=" ")).as_matrix()
-            if joint.get("type") == "fixed":
-                self.mount = self.mount @ transform
-            else:
-                axis = np.fromstring(joint.find("axis").get("xyz"), sep=" ")
-                limit = joint.find("limit")
-                self.joints.append(
-                    GimbalJoint(transform, axis, np.array([float(limit.get("lower")), float(limit.get("upper"))]))
-                )
-        self.limits = np.stack([joint.limits for joint in self.joints])
-        # CAD aperture lies on the brass housing's -X face, ahead of the PCB.
-        self.aperture = np.array([0.00575, 0.0385747972958, -0.0121803398875])
-        self.direction = np.array([-1.0, 0.0, 0.0])
-        self.masses = []
-        for name in ("gimbal_yaw", "gimbal_pitch", "laser_adapter"):
-            inertial = root.find(f"link[@name='{name}']/inertial")
-            assert inertial is not None
-            self.masses.append(
-                MassPoint(
-                    float(inertial.find("mass").get("value")),
-                    np.fromstring(inertial.find("origin").get("xyz"), sep=" "),
-                )
-            )
-
-    def forward(self, angles: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """Return the laser origin, unit direction and mass-weighted link positions."""
-        transform = self.mount.copy()
-        moment = np.zeros(3)
-        for i, (joint, angle) in enumerate(zip(self.joints, angles)):
-            motion = np.eye(4)
-            motion[:3, :3] = Rotation.from_rotvec(joint.axis * angle).as_matrix()
-            transform = transform @ joint.transform @ motion
-            entry = self.masses[i]
-            moment += entry.mass * (transform[:3, :3] @ entry.com + transform[:3, 3])
-        entry = self.masses[2]
-        moment += entry.mass * (transform[:3, :3] @ entry.com + transform[:3, 3])
-        return transform[:3, :3] @ self.aperture + transform[:3, 3], transform[:3, :3] @ self.direction, moment
-
-    def residual(self, angles: np.ndarray, target: np.ndarray) -> np.ndarray:
-        """Return the direction residual for a carrier-frame target."""
-        origin, direction, _ = self.forward(angles)
-        vector = target - origin
-        distance = np.linalg.norm(vector)
-        return vector / max(distance, 1e-6) - direction
-
-    def solve(self, target: np.ndarray, current: np.ndarray) -> np.ndarray | None:
-        """Return feasible yaw and pitch angles for the estimated target."""
-        if target.shape != (3,) or not np.isfinite(target).all():
-            return None
-        angles = np.clip(current, self.limits[:, 0], self.limits[:, 1])
-        for _ in range(40):
-            error = self.residual(angles, target)
-            if np.linalg.norm(error) < 1e-7:
-                return angles
-            jacobian = np.column_stack(
-                [(self.residual(angles + offset, target) - error) / 1e-5 for offset in np.eye(2) * 1e-5]
-            )
-            change = np.linalg.lstsq(jacobian, -error, rcond=None)[0]
-            angles = np.clip(angles + np.clip(change, -0.2, 0.2), self.limits[:, 0], self.limits[:, 1])
-        return angles if np.linalg.norm(self.residual(angles, target)) < 1e-4 else None
-
-
 class AimController:
     """Track fused targets with bounded command speed and acceleration."""
 
-    def __init__(self, solver: GimbalSolver):
-        self.solver = solver
+    def __init__(self, limits: np.ndarray):
+        self.limits = limits.copy()
         self.command = np.zeros(2)
         self.goal = np.zeros(2)
         self.velocity = np.zeros(2)
         self.last_measurement = -np.inf
         self.status = "waiting for fusion"
 
-    def observe(self, target: np.ndarray | None, time: float):
-        """Update the goal from a valid carrier-frame measurement or hold the command."""
-        angles = None if target is None else self.solver.solve(target, self.command)
+    def observe(self, angles: np.ndarray | None, time: float):
+        """Update the goal from solved yaw and pitch angles or hold the command."""
         if angles is None:
             self.goal[:] = self.command
             self.velocity[:] = 0
-            self.status = "fusion unavailable" if target is None else "target unreachable"
+            self.status = "target unavailable"
         else:
             self.goal[:] = angles
             self.last_measurement = time
@@ -220,7 +122,7 @@ class AimController:
         arrived = (np.abs(movement) >= np.abs(error)) & (movement * error >= 0)
         self.command += np.where(arrived, error, movement)
         self.velocity[arrived] = 0
-        self.command[:] = np.clip(self.command, self.solver.limits[:, 0], self.solver.limits[:, 1])
+        self.command[:] = np.clip(self.command, self.limits[:, 0], self.limits[:, 1])
         return self.command.copy()
 
 

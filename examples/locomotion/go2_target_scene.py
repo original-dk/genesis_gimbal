@@ -1,14 +1,13 @@
 """Build the moving-target scene and orchestrate RGB, LiDAR and laser aiming in Genesis."""
 
-from pathlib import Path
-
 import cv2
 import numpy as np
 import torch
-from go2_aiming import AimController, Fusion, GimbalSolver, RangeGeom, cast_ranges, detect_icon, fuse_depth
+from go2_aiming import AimController, Fusion, RangeGeom, cast_ranges, detect_icon, fuse_depth
 from go2_gimbal import GIMBAL_KP
 
 import genesis as gs
+from examples.locomotion.go2_gimbal_solver import PixelGimbalSolver
 from genesis.utils.geom import quat_to_R
 from genesis.utils.misc import tensor_to_array
 
@@ -21,8 +20,6 @@ class TargetScene:
         parameters = cv2.aruco.DetectorParameters()
         parameters.cornerRefinementMethod = cv2.aruco.CORNER_REFINE_SUBPIX
         self.detector = cv2.aruco.ArucoDetector(cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50), parameters)
-        self.solver = GimbalSolver(Path(gs.__file__).parent / "assets/urdf/go2/urdf/go2_gimbal.urdf")
-        self.controller = AimController(self.solver)
         self.camera = None
         self.scene = None
         self.robot = None
@@ -37,12 +34,14 @@ class TargetScene:
         self.beam = None
         self.spot = None
         self.cloud = None
-        self.target_carrier = None
         self.hit_distance = 10.0
         self.measured_points = np.empty((0, 3))
-        self.camera_pos = np.array([0.275, 0.0, 0.10])
         self.lidar_pos = np.array([0.268, 0.0, 0.155])
-        self.optical_rotation = np.array([[0.0, 0.0, 1.0], [-1.0, 0.0, 0.0], [0.0, -1.0, 0.0]])
+        self.pixel_solver = PixelGimbalSolver()
+        self.camera_pos = self.pixel_solver.camera_to_carrier[:3, 3]
+        self.optical_rotation = self.pixel_solver.camera_to_carrier[:3, :3]
+        self.solver = self.pixel_solver.gimbal
+        self.controller = AimController(self.solver.limits)
         azimuth, elevation = np.meshgrid(np.deg2rad(np.linspace(-60, 60, 121)), np.deg2rad(np.linspace(-30, 30, 41)))
         self.ray_directions = np.stack(
             (np.cos(elevation) * np.cos(azimuth), np.cos(elevation) * np.sin(azimuth), np.sin(elevation)), axis=-1
@@ -87,7 +86,7 @@ class TargetScene:
 
     def reset(self, time: float):
         """Restart aiming from zero after the robot's episode reset."""
-        self.controller = AimController(self.solver)
+        self.controller = AimController(self.solver.limits)
         self.next_measurement = time
 
     def update(self, time: float, dt: float, targets: torch.Tensor):
@@ -118,10 +117,15 @@ class TargetScene:
                 )
             camera_points = (self.measured_points - camera_pos) @ optical
             self.fusion = fuse_depth(self.detection, camera_points, self.camera.intrinsics)
-            self.target_carrier = None
+            angles = None
             if self.fusion.point_camera is not None:
-                self.target_carrier = self.optical_rotation @ self.fusion.point_camera + self.camera_pos
-            self.controller.observe(self.target_carrier, time)
+                assert self.detection is not None
+                angles = self.pixel_solver.solve(*self.detection.center, self.fusion.depth)
+            self.controller.observe(angles, time)
+            if angles is None:
+                self.controller.status = (
+                    "target unreachable" if self.fusion.point_camera is not None else "fusion unavailable"
+                )
         command = self.controller.step(time, dt)
         # Differentiate gravitational potential at the measured angles for feedforward.
         angles = tensor_to_array(self.robot.get_dofs_position(self.gimbal_dofs, envs_idx=0))[0]

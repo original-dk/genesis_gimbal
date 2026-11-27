@@ -1,6 +1,6 @@
 """Numerical checks for the Go2 RGB, range and laser targeting pipeline."""
 
-from pathlib import Path
+from dataclasses import replace
 
 import cv2
 import numpy as np
@@ -8,12 +8,13 @@ import numpy as np
 from examples.locomotion.go2_aiming import (
     AimController,
     Detection,
-    GimbalSolver,
     RangeGeom,
     cast_ranges,
     detect_icon,
     fuse_depth,
 )
+from examples.locomotion.go2_gimbal_solver import GimbalSolver, PixelGimbalSolver
+from examples.locomotion.go2_pixel_gimbal_config import DEFAULT_CONFIG
 
 
 def test_marker_detection():
@@ -24,6 +25,30 @@ def test_marker_detection():
     detection = detect_icon(image, cv2.aruco.ArucoDetector(dictionary))
     assert detection is not None
     assert np.allclose(detection.center, [159.5, 119.5], atol=1)
+
+
+def test_pixel_depth_to_angles():
+    intrinsics = np.array([[400.0, 0, 320], [0, 400.0, 240], [0, 0, 1.0]])
+    transform = np.eye(4)
+    transform[:3, :3] = np.array([[0.0, 0, 1], [-1.0, 0, 0], [0, -1.0, 0]])
+    transform[:3, 3] = [0.275, 0, 0.1]
+    solver = PixelGimbalSolver(replace(DEFAULT_CONFIG, camera_fx=400.0, camera_fy=400.0))
+    for reference in (np.array([1.2, 0.2]), np.array([2.0, -0.2])):
+        origin, direction, _ = solver.gimbal.forward(reference)
+        target = origin + 2 * direction
+        camera = transform[:3, :3].T @ (target - transform[:3, 3])
+        assert camera[2] > 0
+        pixel = intrinsics @ camera
+        angles = solver.solve(*(pixel[:2] / pixel[2]), camera[2])
+        assert angles is not None
+        assert np.linalg.norm(solver.gimbal.residual(angles, target)) < 1e-4
+    for depth in (0, -1, np.nan, np.inf):
+        try:
+            solver.solve(320, 240, depth)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("Invalid optical depth accepted")
 
 
 def test_tilted_plane_fusion_and_sparse_rejection():
@@ -52,7 +77,7 @@ def test_range_occlusion():
 
 
 def test_aiming_geometry_and_stale_hold():
-    solver = GimbalSolver(Path(__file__).parents[1] / "genesis/assets/urdf/go2/urdf/go2_gimbal.urdf")
+    solver = GimbalSolver()
     for reference in (
         np.array([0.2, -0.3]),
         np.array([1.2, 0.4]),
@@ -65,9 +90,9 @@ def test_aiming_geometry_and_stale_hold():
         angles = solver.solve(target, np.zeros(2))
         assert angles is not None
         assert np.linalg.norm(solver.residual(angles, target)) < 1e-4
-    controller = AimController(solver)
+    controller = AimController(solver.limits)
     origin, direction, _ = solver.forward(np.array([0.5, 0.1]))
-    controller.observe(origin + 2 * direction, 0)
+    controller.observe(solver.solve(origin + 2 * direction, np.zeros(2)), 0)
     controller.step(0, 0.02)
     command = controller.command.copy()
     controller.step(0.3, 0.02)
