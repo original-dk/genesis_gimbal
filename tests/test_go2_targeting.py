@@ -53,7 +53,13 @@ def test_range_occlusion():
 
 def test_aiming_geometry_and_stale_hold():
     solver = GimbalSolver(Path(__file__).parents[1] / "genesis/assets/urdf/go2/urdf/go2_gimbal.urdf")
-    for reference in (np.array([0.2, -0.3]), np.array([1.2, 0.4]), np.array([-0.5, 0.2])):
+    for reference in (
+        np.array([0.2, -0.3]),
+        np.array([1.2, 0.4]),
+        np.array([-0.5, 0.2]),
+        np.array([2.5, 0.2]),
+        np.array([-2.5, -0.2]),
+    ):
         origin, direction, _ = solver.forward(reference)
         target = origin + 2 * direction
         angles = solver.solve(target, np.zeros(2))

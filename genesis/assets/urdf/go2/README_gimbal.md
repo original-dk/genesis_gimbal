@@ -63,7 +63,8 @@ velocity limit is therefore 1000 * 2*pi/60 = 104.71975511965977 rad/s. Page 22's
 describe different test conditions from the integrated drive limit.
 
 The aiming controller retains the application speed limit of 60 degrees/s and
-acceleration limit of 180 degrees/s^2. The +/-90 degree travel limits, damping
+acceleration limit of 180 degrees/s^2. Yaw travel is +/-180 degrees and pitch
+travel is +/-90 degrees. These travel limits, damping
 0.005 N m s/rad and Genesis position-controller gains remain provisional.
 Check mechanical travel, cable clearance and measured servo response.
 
