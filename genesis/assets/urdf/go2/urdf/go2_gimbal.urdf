@@ -1595,7 +1595,7 @@ Stephen Brawner (brawner@gmail.com)
     <child link="gimbal_yaw" />
     <origin xyz="0.0 0.0 0.03170000000000005" rpy="0 0 0" />
     <axis xyz="0 0 1" />
-    <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.2" velocity="2" />
+    <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.018" velocity="104.71975511965977" />
     <dynamics damping="0.005" friction="0" />
   </joint>
   
@@ -1604,7 +1604,7 @@ Stephen Brawner (brawner@gmail.com)
     <child link="gimbal_pitch" />
     <origin xyz="0.0 -0.01057479729582 0.03659999999999991" rpy="0 0 0" />
     <axis xyz="0 -1 0" />
-    <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.2" velocity="2" />
+    <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.018" velocity="104.71975511965977" />
     <dynamics damping="0.005" friction="0" />
   </joint>
   

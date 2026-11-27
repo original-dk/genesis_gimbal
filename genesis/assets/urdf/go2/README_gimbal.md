@@ -20,7 +20,7 @@ The robot has 12 leg joints and two gimbal joints. The locomotion training and
 evaluation environment loads this asset directly. Its policy controls the 12 leg
 joints by name and observes their states. Separate position controllers hold both
 gimbal axes at zero with provisional gains of kp=5 and kd=0.1 and torque limits
-of +/-0.2 N m. Episode resets restore the full robot state including both axes.
+from the URDF effort values. Episode resets restore the full robot state including both axes.
 The policy action dimension remains 12 and its observation dimension remains 45.
 Training with this asset includes the added accessory mass and inertia.
 
@@ -51,9 +51,34 @@ and screws remain with their corresponding moving link.
 
 ## Provisional physics parameters
 
-Both axes have provisional limits of +/-90 degrees, effort 0.2 N m, speed
-2 rad/s and damping 0.005 N m s/rad. Replace these values after measuring the
-hardware and checking mechanical travel and cable clearance.
+Both axes use the F32C manual dated 2026-07-21. Page 22 gives rated torque
+18 mN m (0.018 N m), stall torque 84.568 mN m (0.084568 N m), and the rated
+operating point 2307 RPM at 0.410 A. The URDF effort limit uses the continuous
+rated torque, 0.018 N m. The stall value is a reference for transient operation
+and requires a thermal/current model before using it as an actuator limit.
+
+Page 3 specifies the integrated drive's 1000 RPM maximum at 12 V. The URDF
+velocity limit is therefore 1000 * 2*pi/60 = 104.71975511965977 rad/s. Page 22's
+2640 +/-10% RPM no-load electrical table and the performance chart's 2931 RPM
+describe different test conditions from the integrated drive limit.
+
+The aiming controller retains the application speed limit of 60 degrees/s and
+acceleration limit of 180 degrees/s^2. The +/-90 degree travel limits, damping
+0.005 N m s/rad and Genesis position-controller gains remain provisional.
+Check mechanical travel, cable clearance and measured servo response.
+
+The manual specifies 8-15 V input, 12 V nominal, 0.4 A rated current, 1.5 A
+maximum working current, 14-bit angle resolution, recommended command frequency
+100 Hz (maximum 200 Hz), and 1 kHz internal speed/position loops. The locomotion
+policy remains at its trained 50 Hz control rate. Electrical, encoder,
+communication-delay and internal-drive-loop dynamics are outside this rigid
+simulation. The manual gives no measured motor mass or rotor inertia, so the
+CAD-derived estimates below remain in use.
+
+The previous 0.2 N m placeholder exceeds the manual's stall torque. With the
+continuous rated torque limit, the 10-second local standing-scene test loses
+stable marker tracking. Servo gains, disturbance rejection and transient torque
+modeling require calibration at the motor's measured operating conditions.
 
 Masses and inertias are estimates from CAD solid geometry and uniform material
 densities: PETG 1270 kg/m^3 for the base plate and carrier, aluminum 2700 kg/m^3

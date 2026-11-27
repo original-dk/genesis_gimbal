@@ -4,7 +4,7 @@ import torch
 from tensordict import TensorDict
 
 import genesis as gs
-from genesis.utils.geom import quat_to_xyz, transform_by_quat, inv_quat, transform_quat_by_quat
+from genesis.utils.geom import inv_quat, quat_to_xyz, transform_by_quat, transform_quat_by_quat
 
 
 def gs_rand(lower, upper, batch_shape):
@@ -96,7 +96,7 @@ class Go2Env:
         self.robot.set_dofs_kv([self.env_cfg["kd"]] * self.num_actions, self.motors_dof_idx)
         self.robot.set_dofs_kp([5.0, 5.0], self.gimbal_dof_idx)
         self.robot.set_dofs_kv([0.1, 0.1], self.gimbal_dof_idx)
-        self.robot.set_dofs_force_range([-0.2, -0.2], [0.2, 0.2], self.gimbal_dof_idx)
+        # The URDF effort limits define the motors' continuous torque bounds.
 
         # Define global gravity direction vector
         self.global_gravity = torch.tensor([0.0, 0.0, -1.0], dtype=gs.tc_float, device=gs.device)

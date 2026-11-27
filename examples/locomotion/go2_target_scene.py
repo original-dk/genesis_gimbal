@@ -131,7 +131,8 @@ class TargetScene:
             _, _, moment_after = self.solver.forward(angles + delta)
             compensation[i] = -np.dot(gravity_local, moment_after - moment_before) / 2e-5
         targets[:] = torch.tensor(
-            np.clip(command + compensation / 5.0, self.solver.limits[:, 0], self.solver.limits[:, 1]), device=gs.device
+            np.clip(command + compensation / 5.0, self.solver.limits[:, 0], self.solver.limits[:, 1]),
+            device=gs.device,
         )
         aperture = positions[1] + rotations[1] @ self.solver.aperture
         direction = rotations[1] @ self.solver.direction
