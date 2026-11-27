@@ -205,6 +205,17 @@ class Go2Env:
     def get_observations(self):
         return TensorDict({"policy": self.obs_buf}, batch_size=[self.num_envs])
 
+    def set_commands(self, commands: torch.Tensor):
+        """Set velocity commands and retain them across episode resets.
+
+        Commands contain forward velocity, lateral velocity and yaw rate in the link frame.
+        Linear velocities use meters per second and yaw rate uses radians per second.
+        """
+        self.commands.copy_(commands)
+        for limit in self.commands_limits:
+            limit.copy_(commands)
+        self._update_observation()
+
     def _reset_idx(self, envs_idx=None):
         # reset state
         self.robot.set_qpos(self.init_qpos, envs_idx=envs_idx, zero_velocity=True)
