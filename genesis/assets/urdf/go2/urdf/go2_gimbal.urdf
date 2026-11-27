@@ -1,0 +1,1617 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by
+Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="go2_description">
+  <link
+    name="base">
+    <inertial>
+      <origin
+        xyz="0.021112 0 -0.005366"
+        rpy="0 0 0" />
+      <mass
+        value="6.921" />
+      <inertia
+        ixx="0.02448"
+        ixy="0.00012166"
+        ixz="0.0014849"
+        iyy="0.098077"
+        iyz="-3.12E-05"
+        izz="0.107" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="../dae/base.dae" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0" />
+      <geometry>
+        <box size="0.3762 0.0935 0.114" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="Head_upper">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="0.001" />
+      <inertia
+        ixx="9.6e-06"
+        ixy="0"
+        ixz="0"
+        iyy="9.6e-06"
+        iyz="0"
+        izz="9.6e-06" />
+    </inertial>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.05" length="0.09" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Head_upper_joint"
+    type="fixed" dont_collapse="true">
+    <origin
+      xyz="0.285 0 0.01"
+      rpy="0 0 0" />
+    <parent
+      link="base" />
+    <child
+      link="Head_upper" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="Head_lower">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="0.001" />
+      <inertia
+        ixx="9.6e-06"
+        ixy="0"
+        ixz="0"
+        iyy="9.6e-06"
+        iyz="0"
+        izz="9.6e-06" />
+    </inertial>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <sphere radius="0.047" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Head_lower_joint"
+    type="fixed" dont_collapse="true">
+    <origin
+      xyz="0.008 0 -0.07"
+      rpy="0 0 0" />
+    <parent
+      link="Head_upper" />
+    <child
+      link="Head_lower" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="FL_hip">
+    <inertial>
+      <origin
+        xyz="-0.0054 0.00194 -0.000105"
+        rpy="0 0 0" />
+      <mass
+        value="0.678" />
+      <inertia
+        ixx="0.00048"
+        ixy="-3.01E-06"
+        ixz="1.11E-06"
+        iyy="0.000884"
+        iyz="-1.42E-06"
+        izz="0.000596" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="../dae/hip.dae" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="1.5707963267948966 0 0" xyz="0 0.08 0" />
+      <geometry>
+        <cylinder length="0.04" radius="0.046" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FL_hip_joint"
+    type="revolute">
+    <origin
+      xyz="0.1934 0.0465 0"
+      rpy="0 0 0" />
+    <parent
+      link="base" />
+    <child
+      link="FL_hip" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-1.0472"
+      upper="1.0472"
+      effort="23.7"
+      velocity="30.1" />
+  </joint>
+  <link
+    name="FL_thigh">
+    <inertial>
+      <origin
+        xyz="-0.00374 -0.0223 -0.0327"
+        rpy="0 0 0" />
+      <mass
+        value="1.152" />
+      <inertia
+        ixx="0.00584"
+        ixy="8.72E-05"
+        ixz="-0.000289"
+        iyy="0.0058"
+        iyz="0.000808"
+        izz="0.00103" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="../dae/thigh.dae" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 1.5707963267948966 0" xyz="0 0 -0.1065" />
+      <geometry>
+        <box size="0.11 0.0245 0.034" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FL_thigh_joint"
+    type="revolute">
+    <origin
+      xyz="0 0.0955 0"
+      rpy="0 0 0" />
+    <parent
+      link="FL_hip" />
+    <child
+      link="FL_thigh" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-1.5708"
+      upper="3.4907"
+      effort="23.7"
+      velocity="30.1" />
+  </joint>
+  <link
+    name="FL_calf">
+    <inertial>
+      <origin
+        xyz="0.00548 -0.000975 -0.115"
+        rpy="0 0 0" />
+      <mass
+        value="0.154" />
+      <inertia
+        ixx="0.00108"
+        ixy="3.4E-07"
+        ixz="1.72E-05"
+        iyy="0.0011"
+        iyz="8.28E-06"
+        izz="3.29E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="../dae/calf.dae" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 -0.21 0" xyz="0.008 0 -0.06" />
+      <geometry>
+        <cylinder length="0.12" radius="0.012" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FL_calf_joint"
+    type="revolute">
+    <origin
+      xyz="0 0 -0.213"
+      rpy="0 0 0" />
+    <parent
+      link="FL_thigh" />
+    <child
+      link="FL_calf" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-2.7227"
+      upper="-0.83776"
+      effort="35.55"
+      velocity="20.07" />
+  </joint>
+  <link
+    name="FL_calflower">
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0" />
+      <geometry>
+        <cylinder length="0.065" radius="0.011" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FL_calflower_joint"
+    type="fixed">
+    <origin
+      xyz="0.020 0 -0.148"
+      rpy="0 0.05 0" />
+    <parent
+      link="FL_calf" />
+    <child
+      link="FL_calflower" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="FL_calflower1">
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0" />
+      <geometry>
+        <cylinder length="0.03" radius="0.0155" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FL_calflower1_joint"
+    type="fixed">
+    <origin
+      xyz="-0.01 0 -0.04"
+      rpy="0 0.48 0" />
+    <parent
+      link="FL_calflower" />
+    <child
+      link="FL_calflower1" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="FL_foot">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="0.04" />
+      <inertia
+        ixx="9.6e-06"
+        ixy="0"
+        ixz="0"
+        iyy="9.6e-06"
+        iyz="0"
+        izz="9.6e-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="../dae/foot.dae" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="-0.002 0 0" />
+      <geometry>
+        <sphere radius="0.022" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FL_foot_joint"
+    type="fixed" dont_collapse="true">
+    <origin
+      xyz="0 0 -0.213"
+      rpy="0 0 0" />
+    <parent
+      link="FL_calf" />
+    <child
+      link="FL_foot" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="FR_hip">
+    <inertial>
+      <origin
+        xyz="-0.0054 -0.00194 -0.000105"
+        rpy="0 0 0" />
+      <mass
+        value="0.678" />
+      <inertia
+        ixx="0.00048"
+        ixy="3.01E-06"
+        ixz="1.11E-06"
+        iyy="0.000884"
+        iyz="1.42E-06"
+        izz="0.000596" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="3.1415 0 0" />
+      <geometry>
+        <mesh
+          filename="../dae/hip.dae" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="1.5707963267948966 0 0" xyz="0 -0.08 0" />
+      <geometry>
+        <cylinder length="0.04" radius="0.046" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FR_hip_joint"
+    type="revolute">
+    <origin
+      xyz="0.1934 -0.0465 0"
+      rpy="0 0 0" />
+    <parent
+      link="base" />
+    <child
+      link="FR_hip" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-1.0472"
+      upper="1.0472"
+      effort="23.7"
+      velocity="30.1" />
+  </joint>
+  <link
+    name="FR_thigh">
+    <inertial>
+      <origin
+        xyz="-0.00374 0.0223 -0.0327"
+        rpy="0 0 0" />
+      <mass
+        value="1.152" />
+      <inertia
+        ixx="0.00584"
+        ixy="-8.72E-05"
+        ixz="-0.000289"
+        iyy="0.0058"
+        iyz="-0.000808"
+        izz="0.00103" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="../dae/thigh_mirror.dae" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 1.5707963267948966 0" xyz="0 0 -0.1065" />
+      <geometry>
+        <box size="0.11 0.0245 0.034" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FR_thigh_joint"
+    type="revolute">
+    <origin
+      xyz="0 -0.0955 0"
+      rpy="0 0 0" />
+    <parent
+      link="FR_hip" />
+    <child
+      link="FR_thigh" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-1.5708"
+      upper="3.4907"
+      effort="23.7"
+      velocity="30.1" />
+  </joint>
+  <link
+    name="FR_calf">
+    <inertial>
+      <origin
+        xyz="0.00548 0.000975 -0.115"
+        rpy="0 0 0" />
+      <mass
+        value="0.154" />
+      <inertia
+        ixx="0.00108"
+        ixy="-3.4E-07"
+        ixz="1.72E-05"
+        iyy="0.0011"
+        iyz="-8.28E-06"
+        izz="3.29E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="../dae/calf_mirror.dae" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 -0.2 0" xyz="0.01 0 -0.06" />
+      <geometry>
+        <cylinder length="0.12" radius="0.013" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FR_calf_joint"
+    type="revolute">
+    <origin
+      xyz="0 0 -0.213"
+      rpy="0 0 0" />
+    <parent
+      link="FR_thigh" />
+    <child
+      link="FR_calf" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-2.7227"
+      upper="-0.83776"
+      effort="35.55"
+      velocity="20.07" />
+  </joint>
+  <link
+    name="FR_calflower">
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0" />
+      <geometry>
+        <cylinder length="0.065" radius="0.011" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FR_calflower_joint"
+    type="fixed">
+    <origin
+      xyz="0.020 0 -0.148"
+      rpy="0 0.05 0" />
+    <parent
+      link="FR_calf" />
+    <child
+      link="FR_calflower" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="FR_calflower1">
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0" />
+      <geometry>
+        <cylinder length="0.03" radius="0.0155" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FR_calflower1_joint"
+    type="fixed">
+    <origin
+      xyz="-0.01 0 -0.04"
+      rpy="0 0.48 0" />
+    <parent
+      link="FR_calflower" />
+    <child
+      link="FR_calflower1" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="FR_foot">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="0.04" />
+      <inertia
+        ixx="9.6e-06"
+        ixy="0"
+        ixz="0"
+        iyy="9.6e-06"
+        iyz="0"
+        izz="9.6e-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="../dae/foot.dae" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="-0.002 0 0" />
+      <geometry>
+        <sphere radius="0.022" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FR_foot_joint"
+    type="fixed" dont_collapse="true">
+    <origin
+      xyz="0 0 -0.213"
+      rpy="0 0 0" />
+    <parent
+      link="FR_calf" />
+    <child
+      link="FR_foot" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="RL_hip">
+    <inertial>
+      <origin
+        xyz="0.0054 0.00194 -0.000105"
+        rpy="0 0 0" />
+      <mass
+        value="0.678" />
+      <inertia
+        ixx="0.00048"
+        ixy="3.01E-06"
+        ixz="-1.11E-06"
+        iyy="0.000884"
+        iyz="-1.42E-06"
+        izz="0.000596" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 3.1415 0" />
+      <geometry>
+        <mesh
+          filename="../dae/hip.dae" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="1.5707963267948966 0 0" xyz="0 0.08 0" />
+      <geometry>
+        <cylinder length="0.04" radius="0.046" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RL_hip_joint"
+    type="revolute">
+    <origin
+      xyz="-0.1934 0.0465 0"
+      rpy="0 0 0" />
+    <parent
+      link="base" />
+    <child
+      link="RL_hip" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-1.0472"
+      upper="1.0472"
+      effort="23.7"
+      velocity="30.1" />
+  </joint>
+  <link
+    name="RL_thigh">
+    <inertial>
+      <origin
+        xyz="-0.00374 -0.0223 -0.0327"
+        rpy="0 0 0" />
+      <mass
+        value="1.152" />
+      <inertia
+        ixx="0.00584"
+        ixy="8.72E-05"
+        ixz="-0.000289"
+        iyy="0.0058"
+        iyz="0.000808"
+        izz="0.00103" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="../dae/thigh.dae" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 1.5707963267948966 0" xyz="0 0 -0.1065" />
+      <geometry>
+        <box size="0.11 0.0245 0.034" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RL_thigh_joint"
+    type="revolute">
+    <origin
+      xyz="0 0.0955 0"
+      rpy="0 0 0" />
+    <parent
+      link="RL_hip" />
+    <child
+      link="RL_thigh" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-0.5236"
+      upper="4.5379"
+      effort="23.7"
+      velocity="30.1" />
+  </joint>
+  <link
+    name="RL_calf">
+    <inertial>
+      <origin
+        xyz="0.00548 -0.000975 -0.115"
+        rpy="0 0 0" />
+      <mass
+        value="0.154" />
+      <inertia
+        ixx="0.00108"
+        ixy="3.4E-07"
+        ixz="1.72E-05"
+        iyy="0.0011"
+        iyz="8.28E-06"
+        izz="3.29E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="../dae/calf.dae" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 -0.2 0" xyz="0.01 0 -0.06" />
+      <geometry>
+        <cylinder length="0.12" radius="0.013" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RL_calf_joint"
+    type="revolute">
+    <origin
+      xyz="0 0 -0.213"
+      rpy="0 0 0" />
+    <parent
+      link="RL_thigh" />
+    <child
+      link="RL_calf" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-2.7227"
+      upper="-0.83776"
+      effort="35.55"
+      velocity="20.07" />
+  </joint>
+  <link
+    name="RL_calflower">
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0" />
+      <geometry>
+        <cylinder length="0.065" radius="0.011" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RL_calflower_joint"
+    type="fixed">
+    <origin
+      xyz="0.020 0 -0.148"
+      rpy="0 0.05 0" />
+    <parent
+      link="RL_calf" />
+    <child
+      link="RL_calflower" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="RL_calflower1">
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0" />
+      <geometry>
+        <cylinder length="0.03" radius="0.0155" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RL_calflower1_joint"
+    type="fixed">
+    <origin
+      xyz="-0.01 0 -0.04"
+      rpy="0 0.48 0" />
+    <parent
+      link="RL_calflower" />
+    <child
+      link="RL_calflower1" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="RL_foot">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="0.04" />
+      <inertia
+        ixx="9.6e-06"
+        ixy="0"
+        ixz="0"
+        iyy="9.6e-06"
+        iyz="0"
+        izz="9.6e-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="../dae/foot.dae" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="-0.002 0 0" />
+      <geometry>
+        <sphere radius="0.022" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RL_foot_joint"
+    type="fixed" dont_collapse="true">
+    <origin
+      xyz="0 0 -0.213"
+      rpy="0 0 0" />
+    <parent
+      link="RL_calf" />
+    <child
+      link="RL_foot" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="RR_hip">
+    <inertial>
+      <origin
+        xyz="0.0054 -0.00194 -0.000105"
+        rpy="0 0 0" />
+      <mass
+        value="0.678" />
+      <inertia
+        ixx="0.00048"
+        ixy="-3.01E-06"
+        ixz="-1.11E-06"
+        iyy="0.000884"
+        iyz="1.42E-06"
+        izz="0.000596" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="3.1415 3.1415 0" />
+      <geometry>
+        <mesh
+          filename="../dae/hip.dae" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="1.5707963267948966 0 0" xyz="0 -0.08 0" />
+      <geometry>
+        <cylinder length="0.04" radius="0.046" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RR_hip_joint"
+    type="revolute">
+    <origin
+      xyz="-0.1934 -0.0465 0"
+      rpy="0 0 0" />
+    <parent
+      link="base" />
+    <child
+      link="RR_hip" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-1.0472"
+      upper="1.0472"
+      effort="23.7"
+      velocity="30.1" />
+  </joint>
+  <link
+    name="RR_thigh">
+    <inertial>
+      <origin
+        xyz="-0.00374 0.0223 -0.0327"
+        rpy="0 0 0" />
+      <mass
+        value="1.152" />
+      <inertia
+        ixx="0.00584"
+        ixy="-8.72E-05"
+        ixz="-0.000289"
+        iyy="0.0058"
+        iyz="-0.000808"
+        izz="0.00103" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="../dae/thigh_mirror.dae" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 1.5707963267948966 0" xyz="0 0 -0.1065" />
+      <geometry>
+        <box size="0.11 0.0245 0.034" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RR_thigh_joint"
+    type="revolute">
+    <origin
+      xyz="0 -0.0955 0"
+      rpy="0 0 0" />
+    <parent
+      link="RR_hip" />
+    <child
+      link="RR_thigh" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-0.5236"
+      upper="4.5379"
+      effort="23.7"
+      velocity="30.1" />
+  </joint>
+  <link
+    name="RR_calf">
+    <inertial>
+      <origin
+        xyz="0.00548 0.000975 -0.115"
+        rpy="0 0 0" />
+      <mass
+        value="0.154" />
+      <inertia
+        ixx="0.00108"
+        ixy="-3.4E-07"
+        ixz="1.72E-05"
+        iyy="0.0011"
+        iyz="-8.28E-06"
+        izz="3.29E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="../dae/calf_mirror.dae" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 -0.2 0" xyz="0.01 0 -0.06" />
+      <geometry>
+        <cylinder length="0.12" radius="0.013" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RR_calf_joint"
+    type="revolute">
+    <origin
+      xyz="0 0 -0.213"
+      rpy="0 0 0" />
+    <parent
+      link="RR_thigh" />
+    <child
+      link="RR_calf" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-2.7227"
+      upper="-0.83776"
+      effort="35.55"
+      velocity="20.07" />
+  </joint>
+  <link
+    name="RR_calflower">
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0" />
+      <geometry>
+        <cylinder length="0.065" radius="0.011" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RR_calflower_joint"
+    type="fixed">
+    <origin
+      xyz="0.020 0 -0.148"
+      rpy="0 0.05 0" />
+    <parent
+      link="RR_calf" />
+    <child
+      link="RR_calflower" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="RR_calflower1">
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0" />
+      <geometry>
+        <cylinder length="0.03" radius="0.0155" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RR_calflower1_joint"
+    type="fixed">
+    <origin
+      xyz="-0.01 0 -0.04"
+      rpy="0 0.48 0" />
+    <parent
+      link="RR_calflower" />
+    <child
+      link="RR_calflower1" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="RR_foot">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="0.04" />
+      <inertia
+        ixx="9.6e-06"
+        ixy="0"
+        ixz="0"
+        iyy="9.6e-06"
+        iyz="0"
+        izz="9.6e-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="../dae/foot.dae" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="-0.002 0 0" />
+      <geometry>
+        <sphere radius="0.022" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RR_foot_joint"
+    type="fixed" dont_collapse="true">
+    <origin
+      xyz="0 0 -0.213"
+      rpy="0 0 0" />
+    <parent
+      link="RR_calf" />
+    <child
+      link="RR_foot" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="imu">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="0" />
+      <inertia
+        ixx="0"
+        ixy="0"
+        ixz="0"
+        iyy="0"
+        iyz="0"
+        izz="0" />
+    </inertial>
+  </link>
+  <joint
+    name="imu_joint"
+    type="fixed">
+    <origin
+      xyz="-0.02557 0 0.04232"
+      rpy="0 0 0" />
+    <parent
+      link="base" />
+    <child
+      link="imu" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="radar">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="0" />
+      <inertia
+        ixx="0"
+        ixy="0"
+        ixz="0"
+        iyy="0"
+        iyz="0"
+        izz="0" />
+    </inertial>
+  </link>
+  <joint
+    name="radar_joint"
+    type="fixed">
+    <origin
+      xyz="0.28945 0 -0.046825"
+      rpy="0 2.8782 0" />
+    <parent
+      link="base" />
+    <child
+      link="radar" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+<link name="mount_base">
+    <visual name="mount_base_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/mount_base.stl" />
+      </geometry>
+    </visual>
+    <collision name="mount_base_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/mount_base.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="2.8515477298611813e-06 0.009791315473302288 0.004004755866694609" rpy="0 0 0" />
+      <mass value="0.2685497141150421" />
+      <inertia ixx="0.0007169076223928791" iyy="0.0005031643497599314" izz="0.0012172269782581083" ixy="-1.7598162388370813e-07" ixz="1.9699355337429047e-09" iyz="-2.2370398799196246e-07" />
+    </inertial>
+  </link>
+  
+<link name="gimbal_carrier">
+    <visual name="gimbal_carrier_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/gimbal_carrier.stl" />
+      </geometry>
+    </visual>
+    <collision name="gimbal_carrier_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/gimbal_carrier.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="4.8647864585166905e-05 7.352963272149182e-07 0.009470660144459317" rpy="0 0 0" />
+      <mass value="0.13852905382896494" />
+      <inertia ixx="6.214125575940736e-05" iyy="9.189034323281236e-05" izz="0.00014102778815461116" ixy="-2.5273549998318407e-09" ixz="3.698350638474465e-08" iyz="7.176404530847073e-10" />
+    </inertial>
+  </link>
+  
+<link name="gimbal_base">
+    <visual name="Gimbal_00_stator_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_00_stator.stl" />
+      </geometry>
+    </visual>
+    <collision name="Gimbal_00_stator_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_00_stator.stl" />
+      </geometry>
+    </collision>
+    <visual name="Gimbal_02_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_02.stl" />
+      </geometry>
+    </visual>
+    <collision name="Gimbal_02_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_02.stl" />
+      </geometry>
+    </collision>
+    <visual name="Gimbal_03_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_03.stl" />
+      </geometry>
+    </visual>
+    <collision name="Gimbal_03_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_03.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="8.228063748932786e-07 4.1578726070443495e-05 0.017888580454127462" rpy="0 0 0" />
+      <mass value="0.06873796773321066" />
+      <inertia ixx="9.94907797282248e-06" iyy="9.98389885642809e-06" izz="1.060269017773752e-05" ixy="5.464542587343328e-10" ixz="5.388218632332392e-10" iyz="3.9532955194439433e-08" />
+    </inertial>
+  </link>
+  
+<link name="gimbal_yaw">
+    <visual name="Gimbal_00_rotor_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_00_rotor.stl" />
+      </geometry>
+    </visual>
+    <collision name="Gimbal_00_rotor_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_00_rotor.stl" />
+      </geometry>
+    </collision>
+    <visual name="Gimbal_04_stator_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_04_stator.stl" />
+      </geometry>
+    </visual>
+    <collision name="Gimbal_04_stator_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_04_stator.stl" />
+      </geometry>
+    </collision>
+    <visual name="Gimbal_06_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_06.stl" />
+      </geometry>
+    </visual>
+    <collision name="Gimbal_06_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_06.stl" />
+      </geometry>
+    </collision>
+    <visual name="Gimbal_07_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_07.stl" />
+      </geometry>
+    </visual>
+    <collision name="Gimbal_07_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_07.stl" />
+      </geometry>
+    </collision>
+    <visual name="Gimbal_08_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_08.stl" />
+      </geometry>
+    </visual>
+    <collision name="Gimbal_08_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_08.stl" />
+      </geometry>
+    </collision>
+    <visual name="Gimbal_10_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_10.stl" />
+      </geometry>
+    </visual>
+    <collision name="Gimbal_10_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_10.stl" />
+      </geometry>
+    </collision>
+    <visual name="Gimbal_11_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_11.stl" />
+      </geometry>
+    </visual>
+    <collision name="Gimbal_11_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_11.stl" />
+      </geometry>
+    </collision>
+    <visual name="Gimbal_13_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_13.stl" />
+      </geometry>
+    </visual>
+    <collision name="Gimbal_13_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_13.stl" />
+      </geometry>
+    </collision>
+    <visual name="Gimbal_17_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_17.stl" />
+      </geometry>
+    </visual>
+    <collision name="Gimbal_17_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_17.stl" />
+      </geometry>
+    </collision>
+    <visual name="Gimbal_18_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_18.stl" />
+      </geometry>
+    </visual>
+    <collision name="Gimbal_18_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_18.stl" />
+      </geometry>
+    </collision>
+    <visual name="Gimbal_19_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_19.stl" />
+      </geometry>
+    </visual>
+    <collision name="Gimbal_19_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_19.stl" />
+      </geometry>
+    </collision>
+    <visual name="Gimbal_20_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_20.stl" />
+      </geometry>
+    </visual>
+    <collision name="Gimbal_20_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_20.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-2.9142785719978524e-05 -0.025472843933735407 0.02969295394642258" rpy="0 0 0" />
+      <mass value="0.09807013899698717" />
+      <inertia ixx="4.367899663815296e-05" iyy="3.070638860118373e-05" izz="2.7467658447692393e-05" ixy="-4.879034122027668e-08" ixz="2.0284696432703898e-08" iyz="9.945709064619686e-06" />
+    </inertial>
+  </link>
+  
+<link name="gimbal_pitch">
+    <visual name="Gimbal_04_rotor_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_04_rotor.stl" />
+      </geometry>
+    </visual>
+    <collision name="Gimbal_04_rotor_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_04_rotor.stl" />
+      </geometry>
+    </collision>
+    <visual name="Gimbal_09_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_09.stl" />
+      </geometry>
+    </visual>
+    <collision name="Gimbal_09_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_09.stl" />
+      </geometry>
+    </collision>
+    <visual name="Gimbal_12_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_12.stl" />
+      </geometry>
+    </visual>
+    <collision name="Gimbal_12_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_12.stl" />
+      </geometry>
+    </collision>
+    <visual name="Gimbal_14_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_14.stl" />
+      </geometry>
+    </visual>
+    <collision name="Gimbal_14_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_14.stl" />
+      </geometry>
+    </collision>
+    <visual name="Gimbal_15_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_15.stl" />
+      </geometry>
+    </visual>
+    <collision name="Gimbal_15_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_15.stl" />
+      </geometry>
+    </collision>
+    <visual name="Gimbal_16_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_16.stl" />
+      </geometry>
+    </visual>
+    <collision name="Gimbal_16_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Gimbal_16.stl" />
+      </geometry>
+    </collision>
+    <visual name="LaserHolder_Approx_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/LaserHolder_Approx.stl" />
+      </geometry>
+    </visual>
+    <collision name="LaserHolder_Approx_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/LaserHolder_Approx.stl" />
+      </geometry>
+    </collision>
+    <visual name="LaserBrass_D6_L10_5_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/LaserBrass_D6_L10_5.stl" />
+      </geometry>
+    </visual>
+    <collision name="LaserBrass_D6_L10_5_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/LaserBrass_D6_L10_5.stl" />
+      </geometry>
+    </collision>
+    <visual name="LaserPCB_Envelope_7x13_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/LaserPCB_Envelope_7x13.stl" />
+      </geometry>
+    </visual>
+    <collision name="LaserPCB_Envelope_7x13_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/LaserPCB_Envelope_7x13.stl" />
+      </geometry>
+    </collision>
+    <visual name="M2_screw_0_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/M2_screw_0.stl" />
+      </geometry>
+    </visual>
+    <collision name="M2_screw_0_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/M2_screw_0.stl" />
+      </geometry>
+    </collision>
+    <visual name="M2_screw_1_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/M2_screw_1.stl" />
+      </geometry>
+    </visual>
+    <collision name="M2_screw_1_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/M2_screw_1.stl" />
+      </geometry>
+    </collision>
+    <visual name="M3_screw_0_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/M3_screw_0.stl" />
+      </geometry>
+    </visual>
+    <collision name="M3_screw_0_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/M3_screw_0.stl" />
+      </geometry>
+    </collision>
+    <visual name="M3_screw_1_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/M3_screw_1.stl" />
+      </geometry>
+    </visual>
+    <collision name="M3_screw_1_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/M3_screw_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.003255085629150929 0.018255788562034938 -0.008541412508569051" rpy="0 0 0" />
+      <mass value="0.023674555110400886" />
+      <inertia ixx="1.374057290626358e-05" iyy="4.417243310205714e-06" izz="1.2634454082415814e-05" ixy="-1.5235893038351243e-06" ixz="4.2045740722536583e-07" iyz="3.5840504457838894e-06" />
+    </inertial>
+  </link>
+  
+<link name="laser_adapter">
+    <visual name="Adapter_M2_to_M3_visual">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Adapter_M2_to_M3.stl" />
+      </geometry>
+    </visual>
+    <collision name="Adapter_M2_to_M3_collision">
+      <geometry>
+        <mesh filename="../gimbal_meshes/Adapter_M2_to_M3.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.0047987152752195245 0.04417999316253926 -0.018209153498764587" rpy="0 0 0" />
+      <mass value="0.00868385161508989" />
+      <inertia ixx="1.6530733214134298e-06" iyy="4.426477707638305e-07" izz="2.083043351341897e-06" ixy="6.484943040233804e-09" ixz="1.551642829276866e-09" iyz="-1.4024935733791442e-09" />
+    </inertial>
+  </link>
+  
+<joint name="mount_base_joint" type="fixed">
+    <parent link="base" />
+    <child link="mount_base" />
+    <origin xyz="-0.022126798366208 0.0016289479923417 0.059186829871672" rpy="0 0 1.5707963267949" />
+  </joint>
+  
+<joint name="gimbal_carrier_joint" type="fixed">
+    <parent link="mount_base" />
+    <child link="gimbal_carrier" />
+    <origin xyz="0.0 0.0 0.008" rpy="0 0 0" />
+  </joint>
+  
+<joint name="gimbal_base_joint" type="fixed">
+    <parent link="gimbal_carrier" />
+    <child link="gimbal_base" />
+    <origin xyz="7.760458942129844e-16 8.881784197001253e-17 0.022000000000180764" rpy="0 0 0" />
+  </joint>
+  
+<joint name="gimbal_yaw_joint" type="revolute">
+    <parent link="gimbal_base" />
+    <child link="gimbal_yaw" />
+    <origin xyz="0.0 0.0 0.03170000000000005" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
+    <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.2" velocity="2" />
+    <dynamics damping="0.005" friction="0" />
+  </joint>
+  
+<joint name="gimbal_pitch_joint" type="revolute">
+    <parent link="gimbal_yaw" />
+    <child link="gimbal_pitch" />
+    <origin xyz="0.0 -0.01057479729582 0.03659999999999991" rpy="0 0 0" />
+    <axis xyz="0 -1 0" />
+    <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.2" velocity="2" />
+    <dynamics damping="0.005" friction="0" />
+  </joint>
+  
+<joint name="laser_adapter_joint" type="fixed">
+    <parent link="gimbal_pitch" />
+    <child link="laser_adapter" />
+    <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+  </joint>
+
+</robot>

@@ -68,7 +68,7 @@ class Go2Env:
 
         self.robot = self.scene.add_entity(
             gs.morphs.URDF(
-                file="urdf/go2/urdf/go2.urdf",
+                file="urdf/go2/urdf/go2_gimbal.urdf",
                 pos=self.env_cfg["base_init_pos"],
                 quat=self.env_cfg["base_init_quat"],
             ),
@@ -78,15 +78,23 @@ class Go2Env:
 
         # names to indices
         self.motors_dof_idx = torch.tensor(
-            [self.robot.get_joint(name).dof_start for name in self.env_cfg["joint_names"]],
+            [self.robot.get_joint(name).dofs_idx_local[0] for name in self.env_cfg["joint_names"]],
             dtype=gs.tc_int,
             device=gs.device,
         )
-        self.actions_dof_idx = torch.argsort(self.motors_dof_idx)
+        self.gimbal_dof_idx = torch.tensor(
+            [self.robot.get_joint(name).dofs_idx_local[0] for name in ("gimbal_yaw_joint", "gimbal_pitch_joint")],
+            dtype=gs.tc_int,
+            device=gs.device,
+        )
+        self.gimbal_target_pos = torch.zeros((num_envs, 2), dtype=gs.tc_float, device=gs.device)
 
         # PD control parameters
         self.robot.set_dofs_kp([self.env_cfg["kp"]] * self.num_actions, self.motors_dof_idx)
         self.robot.set_dofs_kv([self.env_cfg["kd"]] * self.num_actions, self.motors_dof_idx)
+        self.robot.set_dofs_kp([5.0, 5.0], self.gimbal_dof_idx)
+        self.robot.set_dofs_kv([0.1, 0.1], self.gimbal_dof_idx)
+        self.robot.set_dofs_force_range([-0.2, -0.2], [0.2, 0.2], self.gimbal_dof_idx)
 
         # Define global gravity direction vector
         self.global_gravity = torch.tensor([0.0, 0.0, -1.0], dtype=gs.tc_float, device=gs.device)
@@ -95,12 +103,16 @@ class Go2Env:
         self.init_base_pos = torch.tensor(self.env_cfg["base_init_pos"], dtype=gs.tc_float, device=gs.device)
         self.init_base_quat = torch.tensor(self.env_cfg["base_init_quat"], dtype=gs.tc_float, device=gs.device)
         self.inv_base_init_quat = inv_quat(self.init_base_quat)
-        self.init_dof_pos = torch.tensor(
-            [self.env_cfg["default_joint_angles"][joint.name] for joint in self.robot.joints[1:]],
+        self.default_dof_pos = torch.tensor(
+            [self.env_cfg["default_joint_angles"][name] for name in self.env_cfg["joint_names"]],
             dtype=gs.tc_float,
             device=gs.device,
         )
-        self.init_qpos = torch.concatenate((self.init_base_pos, self.init_base_quat, self.init_dof_pos))
+        self.init_qpos = torch.zeros(self.robot.n_qs, dtype=gs.tc_float, device=gs.device)
+        self.init_qpos[:3] = self.init_base_pos
+        self.init_qpos[3:7] = self.init_base_quat
+        for name in self.env_cfg["joint_names"]:
+            self.init_qpos[self.robot.get_joint(name).qs_idx_local[0]] = self.env_cfg["default_joint_angles"][name]
         self.init_projected_gravity = transform_by_quat(self.global_gravity, self.inv_base_init_quat)
 
         # initialize buffers
@@ -132,11 +144,6 @@ class Go2Env:
         self.base_pos = torch.empty((self.num_envs, 3), dtype=gs.tc_float, device=gs.device)
         self.base_quat = torch.empty((self.num_envs, 4), dtype=gs.tc_float, device=gs.device)
         self.base_euler = torch.empty((self.num_envs, 3), dtype=gs.tc_float, device=gs.device)
-        self.default_dof_pos = torch.tensor(
-            [self.env_cfg["default_joint_angles"][name] for name in self.env_cfg["joint_names"]],
-            dtype=gs.tc_float,
-            device=gs.device,
-        )
         self.extras = dict()  # extra information for logging
 
         # prepare reward functions and multiply reward scales by dt
@@ -162,7 +169,8 @@ class Go2Env:
         self.actions = torch.clip(actions, -self.env_cfg["clip_actions"], self.env_cfg["clip_actions"])
         exec_actions = self.last_actions if self.simulate_action_latency else self.actions
         target_dof_pos = exec_actions * self.env_cfg["action_scale"] + self.default_dof_pos
-        self.robot.control_dofs_position(target_dof_pos[:, self.actions_dof_idx], slice(6, 18))
+        self.robot.control_dofs_position(target_dof_pos, self.motors_dof_idx)
+        self.robot.control_dofs_position(self.gimbal_target_pos, self.gimbal_dof_idx)
         self.scene.step()
 
         # update buffers
@@ -231,7 +239,7 @@ class Go2Env:
             self.base_pos.copy_(self.init_base_pos)
             self.base_quat.copy_(self.init_base_quat)
             self.projected_gravity.copy_(self.init_projected_gravity)
-            self.dof_pos.copy_(self.init_dof_pos)
+            self.dof_pos.copy_(self.default_dof_pos)
             self.base_lin_vel.zero_()
             self.base_ang_vel.zero_()
             self.dof_vel.zero_()
@@ -246,7 +254,7 @@ class Go2Env:
             torch.where(
                 envs_idx[:, None], self.init_projected_gravity, self.projected_gravity, out=self.projected_gravity
             )
-            torch.where(envs_idx[:, None], self.init_dof_pos, self.dof_pos, out=self.dof_pos)
+            torch.where(envs_idx[:, None], self.default_dof_pos, self.dof_pos, out=self.dof_pos)
             self.base_lin_vel.masked_fill_(envs_idx[:, None], 0.0)
             self.base_ang_vel.masked_fill_(envs_idx[:, None], 0.0)
             self.dof_vel.masked_fill_(envs_idx[:, None], 0.0)
