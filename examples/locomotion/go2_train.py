@@ -2,8 +2,8 @@ import argparse
 import math
 import os
 import pickle
-import shutil
 from importlib import metadata
+from pathlib import Path
 
 try:
     if int(metadata.version("rsl-rl-lib").split(".")[0]) < 5:
@@ -146,12 +146,18 @@ def main():
         "-e", "--exp-name", type=str, default="go2-walking", help="Experiment name; also the log directory under logs/"
     )
     parser.add_argument("-b", "--num-envs", type=int, default=4096, help="Number of parallel environments")
-    parser.add_argument("--max-iterations", type=int, default=1001, help="Number of learning iterations")
+    parser.add_argument("--max-iterations", type=int, default=1001, help="Number of additional learning iterations")
+    parser.add_argument("--resume", action="store_true", help="Continue training with the saved experiment configuration")
+    parser.add_argument("--ckpt", type=int, help="Checkpoint iteration to resume from (default: latest)")
     parser.add_argument("--max-forward-speed", type=float, default=1.5, help="Forward/backward speed limit in m/s")
     parser.add_argument("--max-lateral-speed", type=float, default=1.0, help="Lateral speed limit in m/s")
     parser.add_argument("--max-yaw-rate", type=float, default=1.5, help="Turning speed limit in rad/s")
     parser.add_argument("--seed", type=int, default=1, help="Random seed")
     args = parser.parse_args()
+    if args.ckpt is not None and (not args.resume or args.ckpt < 0):
+        parser.error("--ckpt requires --resume and a nonnegative iteration.")
+    if args.max_iterations <= 0 or args.num_envs <= 0:
+        parser.error("Iterations and number of environments must be positive.")
     if any(
         not math.isfinite(value) or value <= 0
         for value in (args.max_forward_speed, args.max_lateral_speed, args.max_yaw_rate)
@@ -159,21 +165,38 @@ def main():
         parser.error("Velocity limits must be finite and positive.")
 
     log_dir = f"logs/{args.exp_name}"
-    env_cfg, obs_cfg, reward_cfg, command_cfg = get_cfgs()
-    for name, limit in (
-        ("lin_vel_x_range", args.max_forward_speed),
-        ("lin_vel_y_range", args.max_lateral_speed),
-        ("ang_vel_range", args.max_yaw_rate),
-    ):
-        command_cfg[name] = [-limit, limit]
-    train_cfg = get_train_cfg(args.exp_name)
-
-    if os.path.exists(log_dir):
-        shutil.rmtree(log_dir)
-    os.makedirs(log_dir, exist_ok=True)
-
-    with open(f"{log_dir}/cfgs.pkl", "wb") as f:
-        pickle.dump([env_cfg, obs_cfg, reward_cfg, command_cfg, train_cfg], f)
+    checkpoint_path = None
+    if args.resume:
+        if args.ckpt is None:
+            checkpoints = [
+                (int(path.stem[6:]), path)
+                for path in Path(log_dir).glob("model_*.pt")
+                if path.stem[6:].isdigit()
+            ]
+            if not checkpoints:
+                parser.error(f"No checkpoints found in {log_dir}.")
+            _, checkpoint_path = max(checkpoints)
+        else:
+            checkpoint_path = Path(log_dir) / f"model_{args.ckpt}.pt"
+        if not checkpoint_path.is_file() or not Path(log_dir, "cfgs.pkl").is_file():
+            parser.error(f"Resume requires a checkpoint and cfgs.pkl in {log_dir}.")
+        with open(f"{log_dir}/cfgs.pkl", "rb") as f:
+            env_cfg, obs_cfg, reward_cfg, command_cfg, train_cfg = pickle.load(f)
+        print(f"Resuming {checkpoint_path} with saved configuration (including velocity ranges).")
+    else:
+        if os.path.exists(log_dir):
+            parser.error(f"Experiment {log_dir} already exists. Use --resume or a new experiment name.")
+        env_cfg, obs_cfg, reward_cfg, command_cfg = get_cfgs()
+        for name, limit in (
+            ("lin_vel_x_range", args.max_forward_speed),
+            ("lin_vel_y_range", args.max_lateral_speed),
+            ("ang_vel_range", args.max_yaw_rate),
+        ):
+            command_cfg[name] = [-limit, limit]
+        train_cfg = get_train_cfg(args.exp_name)
+        os.makedirs(log_dir)
+        with open(f"{log_dir}/cfgs.pkl", "wb") as f:
+            pickle.dump([env_cfg, obs_cfg, reward_cfg, command_cfg, train_cfg], f)
 
     # Training throughput comes from the 4096 parallel environments, which need a GPU.
     gs.init(backend=gs.gpu, precision="32", logging_level="warning", seed=args.seed, performance_mode=True)
@@ -183,6 +206,8 @@ def main():
     )
 
     runner = OnPolicyRunner(env, train_cfg, log_dir, device=gs.device)
+    if checkpoint_path is not None:
+        runner.load(str(checkpoint_path))
 
     runner.learn(num_learning_iterations=args.max_iterations, init_at_random_ep_len=True)
 
