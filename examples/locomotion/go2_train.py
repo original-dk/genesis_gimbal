@@ -126,12 +126,15 @@ def get_cfgs():
             "tracking_ang_vel": 0.2,
             "lin_vel_z": -1.0,
             "base_height": -50.0,
-            "action_rate": -0.005,
+            "action_rate": -0.01,
             "similar_to_default": -0.1,
+            "standing_dof_vel": -0.02,
+            "standing_pose": -0.5,
         },
     }
     command_cfg = {
         "num_commands": 3,
+        "standing_probability": 0.2,
         "lin_vel_x_range": [-1.5, 1.5],
         "lin_vel_y_range": [-1.0, 1.0],
         "ang_vel_range": [-1.5, 1.5],

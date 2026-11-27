@@ -28,6 +28,9 @@ class Go2Env:
         self.obs_cfg = obs_cfg
         self.reward_cfg = reward_cfg
         self.command_cfg = command_cfg
+        self.standing_probability = command_cfg.get("standing_probability", 0.0)
+        if not 0.0 <= self.standing_probability <= 1.0:
+            raise ValueError("Standing probability must be between zero and one.")
 
         self.obs_scales: dict[str, float] = obs_cfg["obs_scales"]
         self.reward_scales: dict[str, float] = reward_cfg["reward_scales"]
@@ -147,6 +150,9 @@ class Go2Env:
 
     def _resample_commands(self, envs_idx):
         commands = gs_rand(*self.commands_limits, (self.num_envs,))
+        if self.standing_probability > 0.0:
+            standing = torch.rand(self.num_envs, device=gs.device) < self.standing_probability
+            commands.masked_fill_(standing[:, None], 0.0)
         if envs_idx is None:
             self.commands.copy_(commands)
         else:
@@ -311,3 +317,13 @@ class Go2Env:
     def _reward_base_height(self):
         # Penalize base height away from target
         return torch.square(self.base_pos[:, 2] - self.reward_cfg["base_height_target"])
+
+    def _reward_standing_dof_vel(self):
+        """Penalize joint motion under a zero velocity command."""
+        standing = torch.all(torch.abs(self.commands) <= gs.EPS, dim=1)
+        return torch.sum(torch.square(self.dof_vel), dim=1) * standing
+
+    def _reward_standing_pose(self):
+        """Penalize deviation from the default stance under a zero velocity command."""
+        standing = torch.all(torch.abs(self.commands) <= gs.EPS, dim=1)
+        return torch.sum(torch.square(self.dof_pos - self.default_dof_pos), dim=1) * standing
