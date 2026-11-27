@@ -77,14 +77,6 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-rl = [
-    "torch>=2.6.0",
-    "tensordict>=0.7.0",
-    "tensorboard",
-    "GitPython",
-    "onnx",
-    "onnxscript>=0.5.4",
-]
 dev = [
     # FIXME: Remove this cap once pytest-forked becomes compatible with newer versions (pytest-forked#112)
     "pytest<9.2.0",
