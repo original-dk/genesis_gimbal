@@ -77,6 +77,14 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+rl = [
+    "torch>=2.6.0",
+    "tensordict>=0.7.0",
+    "tensorboard",
+    "GitPython",
+    "onnx",
+    "onnxscript>=0.5.4",
+]
 dev = [
     # FIXME: Remove this cap once pytest-forked becomes compatible with newer versions (pytest-forked#112)
     "pytest<9.2.0",
@@ -150,9 +158,10 @@ gs = "genesis._main:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["genesis", "genesis.*"]
+include = ["genesis", "genesis.*", "rsl_rl", "rsl_rl.*"]
 
 [tool.setuptools.package-data]
+rsl_rl = ["licenses/**/*", "VENDORED.md"]
 genesis = [
     "assets/*",
     "ext/pyrender/fonts/*",

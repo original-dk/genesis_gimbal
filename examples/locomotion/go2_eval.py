@@ -2,15 +2,9 @@ import argparse
 import math
 import os
 import pickle
-from importlib import metadata
 
 import torch
 
-try:
-    if int(metadata.version("rsl-rl-lib").split(".")[0]) < 5:
-        raise ImportError
-except (metadata.PackageNotFoundError, ImportError, ValueError) as e:
-    raise ImportError("Please install 'rsl-rl-lib>=5.0.0'.") from e
 from rsl_rl.runners import OnPolicyRunner
 
 import genesis as gs
