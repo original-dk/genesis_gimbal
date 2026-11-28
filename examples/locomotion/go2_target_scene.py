@@ -5,9 +5,9 @@ import numpy as np
 import torch
 from go2_aiming import AimController, Fusion, RangeGeom, cast_ranges, detect_icon, fuse_depth
 from go2_gimbal import GIMBAL_KP
+from go2_targeting.solver import PixelGimbalSolver
 
 import genesis as gs
-from examples.locomotion.go2_gimbal_solver import PixelGimbalSolver
 from genesis.utils.geom import quat_to_R
 from genesis.utils.misc import tensor_to_array
 

@@ -13,8 +13,8 @@ from examples.locomotion.go2_aiming import (
     detect_icon,
     fuse_depth,
 )
-from examples.locomotion.go2_gimbal_solver import GimbalSolver, PixelGimbalSolver
-from examples.locomotion.go2_pixel_gimbal_config import DEFAULT_CONFIG
+from examples.locomotion.go2_targeting.config import DEFAULT_CONFIG
+from examples.locomotion.go2_targeting.solver import GimbalSolver, PixelGimbalSolver
 
 
 def test_marker_detection():

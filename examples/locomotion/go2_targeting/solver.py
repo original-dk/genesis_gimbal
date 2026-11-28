@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from .go2_pixel_gimbal_config import DEFAULT_CONFIG, PixelGimbalConfig
+from .config import DEFAULT_CONFIG, PixelGimbalConfig
 
 
 @dataclass(frozen=True)

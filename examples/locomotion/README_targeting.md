@@ -3,7 +3,7 @@
 Run the trained policy with the new gimbal asset and target scene:
 
 ```bash
-PYTHONPATH=. python examples/locomotion/go2_eval.py \
+python examples/locomotion/go2_eval.py \
   -e go2-velocity-standing --ckpt 1000
 ```
 
@@ -22,7 +22,7 @@ shows the beam, hit spot and a subsampled point cloud.
 For bounded runs with window creation disabled:
 
 ```bash
-PYTHONPATH=. python examples/locomotion/go2_eval.py \
+python examples/locomotion/go2_eval.py \
   -e go2-velocity-standing --ckpt 1000 --headless --steps 500
 ```
 
@@ -34,7 +34,7 @@ dependencies of the repository's RSL-RL source. OpenCV must provide `cv2.aruco`.
 
 ### Independent pixel/depth interface
 
-`go2_pixel_gimbal_config.py` contains the default `PixelGimbalConfig`.
+`go2_targeting/config.py` contains the default `PixelGimbalConfig`.
 Replace `camera_fx`, `camera_fy`, `camera_cx`, `camera_cy` and `camera_to_base`
 with the calibration of your camera and installation. Default values describe
 this simulation. Installation poses use meters and roll/pitch/yaw in degrees.
@@ -42,8 +42,8 @@ A camera with zero RPY faces base +X, with image up along base +Z.
 
 ```python
 from dataclasses import replace
-from examples.locomotion.go2_gimbal_solver import PixelGimbalSolver
-from examples.locomotion.go2_pixel_gimbal_config import DEFAULT_CONFIG, PoseConfig
+from go2_targeting.solver import PixelGimbalSolver
+from go2_targeting.config import DEFAULT_CONFIG, PoseConfig
 
 config = replace(
     DEFAULT_CONFIG,
@@ -95,7 +95,7 @@ geometry to `TargetScene`. The laser uses the same range scene with a 10 m limit
 It stops at the nearest surface, including intervening obstacles.
 
 The independent numerical inverse solver uses fixed mounting transforms, joint
-axes and limits from `go2_pixel_gimbal_config.py`. The laser aperture is
+axes and limits from `go2_targeting/config.py`. The laser aperture is
 `(0.00575, 0.0385747972958, -0.0121803398875)` m in the CAD pitch-link frame,
 and emits along local -X. It includes both pivot and aperture offsets.
 The motor command has a 60 degree/s speed limit and 180 degree/s^2 acceleration
