@@ -1,5 +1,7 @@
 # Go2 velocity policy and automatic laser aiming
 
+[中文说明](README_targeting_zh.md)
+
 Run the trained policy with the new gimbal asset and target scene:
 
 ```bash
